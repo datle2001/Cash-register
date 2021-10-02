@@ -1,0 +1,53 @@
+function checkCashRegister(price, cash, cid) {
+  let amountDue = cash - price;
+  let obj = {
+    status: "",
+    change: []
+  };
+  let bank = {
+    "PENNY": 0.01,
+    "NICKEL": 0.05,
+    "DIME": 0.1,
+    "QUARTER": 0.25,
+    "ONE": 1,
+    "FIVE": 5,
+    "TEN": 10,
+    "TWENTY": 20,
+    "ONE HUNDRED": 100
+  }
+  let k = -1;
+  let total = 0;
+  for(let i = cid.length-1; i>=0; i--) {
+    total += cid[i][1];
+    if(cid[i][1] <= amountDue && cid[i][1] > 0) {
+      obj.change.push(cid[i]);
+      k++;
+      amountDue = (amountDue - cid[i][1]).toFixed(2);
+      total = (total - cid[i][1]).toFixed(2);
+    }
+    else if(cid[i][1] > amountDue && bank[cid[i][0]] <= amountDue) {
+      obj.change.push([cid[i][0], 0]);
+      k++;
+      while(bank[cid[i][0]] <= amountDue) {
+        obj.change[k][1] = (obj.change[k][1] + bank[cid[i][0]]);
+        amountDue = (amountDue - bank[cid[i][0]]).toFixed(2);
+        total = (total - bank[cid[i][0]]).toFixed(2);
+      }
+    }
+    if(amountDue < 0.01) break;
+  }
+  if(amountDue >= 0.01) {
+    obj.status = "INSUFFICIENT_FUNDS";
+    obj.change = [];
+  }
+  else if(amountDue < 0.01 && total < 0.01) {
+    obj.status = "CLOSED";
+    obj.change = cid;
+  }
+  else {
+    obj.status = "OPEN";
+  }
+  return obj;
+}
+
+console.log(checkCashRegister(3.26, 100, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]));
